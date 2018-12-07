@@ -4,9 +4,10 @@ head
 		include jquery-3.2.1.min.js
 	script
 		include js_file.js
+	script(src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js")
 body
 	h1 Загрузить учебный план 
-	form(method='post' enctype="multipart/form-data")
+	form(id="fup" enctype="multipart/form-data" method="post"  action="/load/a")
 		p Выберите направление подготовки
 		p
 			select(name='dir')
