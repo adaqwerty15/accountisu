@@ -29,10 +29,11 @@ data = file.toString();
 			var discip = dis[i]['$']['Дис'];
 			for (j=0; j<dis[i]['Сем'].length; j++) {
 				var sem = dis[i]['Сем'][j]['$']['Ном'];
-				var lab = dis[i]['Сем'][j]['$']['Лаб']!=undefined ?  parseFloat((parseInt(dis[i]['Сем'][j]['$']['Лаб'])/2)/hours[dis[i]['Сем'][j]['$']['Ном']-1].hours).toFixed(1) : 0;
-				var pr = dis[i]['Сем'][j]['$']['Пр']!=undefined ?  (parseInt(dis[i]['Сем'][j]['$']['Пр'])/2/hours[dis[i]['Сем'][j]['$']['Ном']-1].hours).toFixed(1) : 0;
-				var lek = dis[i]['Сем'][j]['$']['Лек']!=undefined ?  (parseInt(dis[i]['Сем'][j]['$']['Лек'])/2/hours[dis[i]['Сем'][j]['$']['Ном']-1].hours).toFixed(1) : 0;
+				var lab = dis[i]['Сем'][j]['$']['Лаб']!=undefined ?  norm(parseFloat((parseInt(dis[i]['Сем'][j]['$']['Лаб'])/2)/hours[dis[i]['Сем'][j]['$']['Ном']-1].hours).toFixed(1)) : 0;
+				var pr = dis[i]['Сем'][j]['$']['Пр']!=undefined ?  norm((parseInt(dis[i]['Сем'][j]['$']['Пр'])/2/hours[dis[i]['Сем'][j]['$']['Ном']-1].hours).toFixed(1)) : 0;
+				var lek = dis[i]['Сем'][j]['$']['Лек']!=undefined ?  norm((parseInt(dis[i]['Сем'][j]['$']['Лек'])/2/hours[dis[i]['Сем'][j]['$']['Ном']-1].hours).toFixed(1)) : 0;
 				var otc = dis[i]['Сем'][j]['$']['Экз']!=undefined ? "Экз" : dis[i]['Сем'][j]['$']['ЗачО']!=undefined ? "ЗачО" : "Зач"
+				if (!(pr==0 && lek==0 && lab==0))
 				res.push({'year':year, 'dis':discip, 'choise':choise, 'sem':sem, 'lek':lek, 'pr':pr, 'lab':lab, 'control': otc })
 			}
 		}
@@ -40,6 +41,11 @@ data = file.toString();
 		done(res)
 	
 
+}
+
+var norm = function(c) {
+	if (c==0.5 || c==1.5) return c;
+	else return Math.round(c)
 }
 
 module.exports.beforeParse = function (file, done) {

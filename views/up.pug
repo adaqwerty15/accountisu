@@ -7,13 +7,26 @@ head
 	script(src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js")
 body
 	h1 Загрузить учебный план 
-	form(id="fup" enctype="multipart/form-data" method="post"  action="/load/a")
-		p Выберите направление подготовки
+	form(id="fup" enctype="multipart/form-data" method="post"  action="/load/a") 
 		p
 			select(name='dir')
+				option(disabled selected) Выберите направление подготовки
 				- var c = dirs
 				each item in c
 					option=item.code+" "+item.direction
 			input(type="file" accept="*/xml" name='file')
 		p 
 			input(type='submit' value="Ok" id='sub')
+	h2 Просмотреть учебный план
+	p
+		select(name='dis' id='dis_change')
+			option(disabled selected) Выберите направление
+			- var c = dirs
+			each item in c
+				option=item.code+" "+item.direction
+		select(name='year' id='year_change')
+			option(disabled selected) Выберите год начала обучения
+			- var c = masy
+			each item in c
+				option=item.year
+	div(id="table")
