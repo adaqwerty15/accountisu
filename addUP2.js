@@ -2,12 +2,16 @@ var express = require('express');
 var mysql  = require('mysql');
 var pug = require('pug');
 var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+var path = require('path');
 
 var parse = require("./parseUP");
 const multer = require('multer')
 var upload = multer().single('file');
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 
 var connection = mysql.createConnection({
@@ -19,7 +23,69 @@ var connection = mysql.createConnection({
 
 app.set('views', './views');
 app.set('view engine', 'pug')
+http.listen(process.argv[2]);
 
+
+
+app.get('/', (req, res) => {
+	res.sendFile(__dirname + '/index.html')
+});
+
+io.on('connection', (socket) => {
+  var addedUser = false;
+  var users = [];
+
+  // when the client emits 'new message', this listens and executes
+  socket.on('new message', (data) => {
+    // we tell the client to execute 'new message'
+    socket.broadcast.emit('new message', {
+      username: socket.username,
+      message: data
+    });
+  });
+
+  // when the client emits 'add user', this listens and executes
+  socket.on('add user', (username) => {
+    if (addedUser) return;
+
+    // we store the username in the socket session for this client
+    socket.username = username;
+    users.push(username);
+    addedUser = true;
+    console.log(users)
+    socket.emit('login');
+    // echo globally (all clients) that a person has connected
+    // socket.broadcast.emit('user joined', {
+    //   username: socket.username,
+    //   numUsers: numUsers
+    // });
+  });
+
+  // when the client emits 'typing', we broadcast it to others
+  socket.on('typing', () => {
+    socket.broadcast.emit('typing', {
+      username: socket.username
+    });
+  });
+
+  // when the client emits 'stop typing', we broadcast it to others
+  socket.on('stop typing', () => {
+    socket.broadcast.emit('stop typing', {
+      username: socket.username
+    });
+  });
+
+  // when the user disconnects.. perform this
+  socket.on('disconnect', () => {
+    if (addedUser) {
+      // echo globally that this client has left
+      // socket.broadcast.emit('user left', {
+      //   username: socket.username,
+      //   numUsers: numUsers
+      // });
+    }
+  });
+});
 
 connection.connect();
 var dirs = [];
@@ -97,5 +163,5 @@ app.post('/load/sub', (req, res) => {
 	}
 });
 
-app.listen(process.argv[2]);
+
 
